@@ -50,3 +50,36 @@ class SubmitDataDetailView(APIView):
                 {"message": "Запись не найдена", "status": 404},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+class SubmitDataUpdateView(APIView):
+    def patch(self, request, id):
+        try:
+            pereval = PerevalAdded.objects.get(id=id)
+        except PerevalAdded.DoesNotExist:
+            return Response(
+                {"state": 0, "message": "Запись не найдена."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Проверяем, что запись в статусе "new"
+        if pereval.status != PerevalAdded.NEW:
+            return Response(
+                {"state": 0, "message": "Запись нельзя редактировать, так как она не в статусе 'new'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Убираем поля, которые нельзя редактировать
+        if 'user' in request.data:
+            del request.data['user']
+
+        # Обновляем запись
+        serializer = PerevalAddedSerializer(pereval, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"state": 1, "message": "Запись успешно обновлена."})
+        else:
+            return Response(
+                {"state": 0, "message": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
