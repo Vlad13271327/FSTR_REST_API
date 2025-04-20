@@ -3,24 +3,64 @@ from .models import PerevalAdded, User, Coords, PerevalImage
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+         Сериализатор пользователя.
+
+         Включает:
+         - email (уникальный);
+         - фамилия, имя, отчество;
+         - номер телефона.
+
+         Используется при добавлении и отображении информации о пользователе.
+     """
     class Meta:
         model = User
         fields = '__all__'
 
 
 class CoordsSerializer(serializers.ModelSerializer):
+    """
+         Сериализатор координат перевала.
+
+         Включает:
+         - широту (latitude),
+         - долготу (longitude),
+         - высоту (height).
+
+         Используется в структуре перевала.
+     """
     class Meta:
         model = Coords
         fields = '__all__'
 
 
 class PerevalImageSerializer(serializers.ModelSerializer):
+    """
+         Сериализатор изображений перевала.
+
+         Включает:
+         - строку изображения (data),
+         - подпись к изображению (title).
+
+         Используется для добавления и отображения фото перевала.
+     """
     class Meta:
         model = PerevalImage
         fields = ['data', 'title']
 
 
 class PerevalAddedSerializer(serializers.ModelSerializer):
+    """
+         Сериализатор для модели PerevalAdded.
+
+         Используется при добавлении, редактировании и выводе информации о перевалах.
+
+         Включает:
+         - пользователя (user),
+         - координаты (coords),
+         - изображения (images),
+         - прочие поля модели перевала.
+     """
     user = UserSerializer()
     coords = CoordsSerializer()
     images = PerevalImageSerializer(many=True)  # Добавляем вложенные изображения
